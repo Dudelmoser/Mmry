@@ -36,7 +36,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        pickCards()
         
         view.backgroundColor = BG_COLOR
         
@@ -47,16 +46,16 @@ class ViewController: UIViewController {
         
         for x in 0..<CARDS_X {
             for y in 0..<CARDS_Y {
-                let btn = UIButton(type: .roundedRect)
+                let btn = UIButton(type: .RoundedRect)
                 let posX = MARGIN_LEFT + Double(x) * INNER_MARGIN + cardWidth * Double(x)
                 let posY = MARGIN_TOP + Double(y) * INNER_MARGIN + cardHeight * Double(y)
                 
                 btn.frame = CGRect(x: posX, y: posY, width: cardWidth, height: cardHeight)
                 btn.tag = x * CARDS_Y + y
-                btn.setTitle(cards[btn.tag], for: .normal)
-                btn.setTitleColor(CARD_BACK, for: .normal)
+                btn.setTitle(cards[btn.tag], forState: UIControlState.Normal)
+                btn.setTitleColor(CARD_BACK, forState: UIControlState.Normal)
                 btn.backgroundColor = CARD_BACK
-                btn.addTarget(self, action: #selector(buttonPressed), for: UIControlEvents.touchUpInside)
+                btn.addTarget(self, action: "buttonPressed:", forControlEvents: <#T##UIControlEvents#>)
                 view.addSubview(btn)
                 btns[btn.tag] = btn
             }
@@ -68,7 +67,7 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    func buttonPressed(_ btn: UIButton!) {
+    func buttonPressed(btn: UIButton!) {
         if ((lastCard) != nil) {
             if (btn.tag != lastCard.tag) {
                 if (btn.currentTitle == lastCard?.currentTitle) {
@@ -80,10 +79,10 @@ class ViewController: UIViewController {
                     lastCard.backgroundColor = CARD_FAILURE
                     print("Cards not matching!")
                     
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
-                        btn.backgroundColor = self.CARD_BACK
-                        self.lastCard?.backgroundColor = self.CARD_BACK
-                    }
+//                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
+//                        btn.backgroundColor = self.CARD_BACK
+//                        self.lastCard?.backgroundColor = self.CARD_BACK
+//                    }
                 }
             }
             lastCard = nil
@@ -93,39 +92,40 @@ class ViewController: UIViewController {
         }
     }
     
-    func pickCards() {
-        cards.removeAll()
-        for i in 1...CARDS_X*CARDS_Y/2 {
-            let suit = SUITS[Int(arc4random_uniform(4))]
-            let rank = RANKS[Int(arc4random_uniform(13))]
-            cards.append(suit + rank)
-            cards.append(suit + rank)
+    func getCardDeck() -> [String] {
+        var deck:[String] = []
+        for suit in SUITS {
+            for rank in RANKS {
+                deck.append(suit + rank)
+            }
         }
-        cards.shuffle()
+        return deck
     }
-}
-
-
-extension MutableCollection where Indices.Iterator.Element == Index {
-    /// Shuffles the contents of this collection.
-    mutating func shuffle() {
-        let c = count
-        guard c > 1 else { return }
-        
-        for (unshuffledCount, firstUnshuffled) in zip(stride(from: c, to: 1, by: -1), indices) {
-            let d: IndexDistance = numericCast(arc4random_uniform(numericCast(unshuffledCount)))
-            guard d != 0 else { continue }
-            let i = index(firstUnshuffled, offsetBy: d)
-            swap(&self[firstUnshuffled], &self[i])
+    
+    func getRandomCard(var deck:[String]) -> String {
+        let index = Int(arc4random_uniform(UInt32(deck.count)))
+        let card = deck[index]
+        deck.removeAtIndex(index)
+        return card
+    }
+    
+    func getRandomCards(n:Int) -> [String]{
+        var cards:[String] = []
+        let deck = getCardDeck()
+        for _ in 0..<n {
+            cards.append(getRandomCard(deck))
         }
+        return cards
     }
-}
-
-extension Sequence {
-    /// Returns an array with the contents of this sequence, shuffled.
-    func shuffled() -> [Iterator.Element] {
-        var result = Array(self)
-        result.shuffle()
-        return result
+    
+    func getRandomPairs(n:Int) -> [String] {
+        var cards = getRandomCards(n)
+        cards.appendContentsOf(cards)
+        var shuffled:[String] = []
+        for _ in 0..<cards.count {
+            let index = Int(arc4random_uniform(UInt32(cards.count)))
+            shuffled.append(cards)
+            
+        }
     }
 }
