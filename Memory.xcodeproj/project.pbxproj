@@ -96,6 +96,7 @@
 				TargetAttributes = {
 					160410A61DC145AA0042294A = {
 						CreatedOnToolsVersion = 8.0;
+						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -299,6 +300,7 @@
 				160410BB1DC145AB0042294A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
